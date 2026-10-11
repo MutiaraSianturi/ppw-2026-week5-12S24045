@@ -7,59 +7,55 @@ use Illuminate\Http\Request;
 
 class KategoriController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    private function rules(?Kategori $kategori = null): array
+    {
+        return [
+            'kode_kategori' => ['required', 'string', 'max:10',
+                'unique:kategoris,kode_kategori' . ($kategori ? ',' . $kategori->id : '')],
+            'nama_kategori' => 'required|string|min:3|max:100',
+        ];
+    }
+
     public function index()
     {
-        //
+        // withCount('bukus') = hitung jumlah buku tiap kategori dalam 1 kueri.
+        // Hasilnya dipanggil lewat $kategori->bukus_count
+        $kategoris = Kategori::withCount('bukus')->latest()->paginate(10);
+        return view('kategori.index', compact('kategoris'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('kategori.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        Kategori::create($request->validate($this->rules()));
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Kategori $kategori)
     {
-        //
+        // buku milik kategori ini, dengan pagination
+        $bukus = $kategori->bukus()->latest()->paginate(10);
+        return view('kategori.show', compact('kategori', 'bukus'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Kategori $kategori)
     {
-        //
+        return view('kategori.edit', compact('kategori'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Kategori $kategori)
     {
-        //
+        $kategori->update($request->validate($this->rules($kategori)));
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Kategori $kategori)
     {
-        //
+        $kategori->delete(); // buku di kategori ini ikut terhapus (cascadeOnDelete di migration)
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dihapus!');
     }
 }
