@@ -31,7 +31,7 @@ class BukuController extends Controller
     {
         // with('kategori') = EAGER LOADING: kategori diambil sekaligus (mencegah N+1)
         // latest() = terbaru dulu, paginate(10) = 10 data per halaman
-             $bukus = Buku::with('kategori')->latest()->paginate(10);
+            $bukus = Buku::with('kategori')->latest()->paginate(10);
         return view('buku.index', compact('bukus'));
     }
 
