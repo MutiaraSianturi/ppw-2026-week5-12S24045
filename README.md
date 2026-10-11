@@ -31,7 +31,7 @@ Catatan: modul menyebut Laravel 11. Proyek ini memakai Laravel 13 sesuai
 arahan dosen. Konsep dan struktur yang dipelajari sama.
 
 ## Cara Instalasi
-1. `git clone https://github.com/[MutiaraSianturi]/ppw-2026-week5-12S24045.git`
+1. `git clone https://github.com/MutiaraSianturi/ppw-2026-week5-12S24045.git`
 2. `cd ppw-2026-week5-12S24045`
 3. `composer install`
 4. `copy .env.example .env`
