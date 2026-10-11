@@ -40,26 +40,21 @@ arahan dosen. Konsep dan struktur yang dipelajari sama.
 7. `php artisan migrate:fresh --seed`
 8. `php artisan serve`, lalu buka http://localhost:8000
 
-## Bukti Audit SQL (Eager Loading vs N+1)
+## Bukti Audit SQL (Eager Loading)
 Kueri dicatat oleh `DB::listen` di `AppServiceProvider` ke
 `storage/logs/laravel.log`. Pengujian dilakukan dengan membuka halaman
-`/buku` satu kali. File bukti ada di folder `docs/`:
-
-- `docs/audit-n-plus-1.log` (tanpa `with()`)
-- `docs/audit-eager-loading.log` (dengan `with('kategori')`)
+`/buku` satu kali. File bukti: `docs/audit-eager-loading.log`.
 
 | Kondisi | Jumlah kueri halaman /buku |
 |---|---|
-| Lazy loading (N+1) | 12 |
 | Eager loading `with('kategori')` | 3 |
 
 Penjelasan:
-- Tanpa eager loading: 1 kueri `count` (dari `paginate()`) + 1 kueri buku
-  + 10 kueri kategori (satu per buku) = 12 kueri.
-- Dengan eager loading: 1 kueri `count` + 1 kueri buku + 1 kueri kategori
-  (`where id in (...)`) = 3 kueri.
-- Data buku beserta kategorinya diambil dengan 2 kueri terpadu. Kueri
-  `count` tambahan berasal dari `paginate()`, bukan dari relasi.
+- 1 kueri `count` (dari `paginate()`) untuk menghitung total halaman.
+- 1 kueri untuk mengambil 10 buku.
+- 1 kueri untuk mengambil semua kategori sekaligus (`where id in (...)`).
+- Data buku beserta kategorinya diambil dengan 2 kueri terpadu, bukan satu
+  kueri per buku, sehingga tidak terjadi N+1 problem.
 - Agar log bersih, session memakai driver `file` (`SESSION_DRIVER=file`)
   sehingga tabel `sessions` tidak muncul di log.
 
