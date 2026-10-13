@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Buku;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
@@ -27,13 +28,41 @@ class BukuController extends Controller
     }
 
     // INDEX: tampilkan daftar buku
-    public function index()
-    {
-        // with('kategori') = EAGER LOADING: kategori diambil sekaligus (mencegah N+1)
-        // latest() = terbaru dulu, paginate(10) = 10 data per halaman
-           $bukus = Buku::with('kategori')->latest()->paginate(10);
-        return view('buku.index', compact('bukus'));
+    public function index(Request $request)
+{
+    // Simpan kata kunci pencarian terakhir di SESSION
+    if ($request->filled('search')) {
+        session(['last_search' => $request->search]);
     }
+
+    $bukus = Buku::with('kategori')            // eager loading kategori (anti N+1)
+        ->withCount('peminjamans')             // hitung peminjaman per buku dalam 1 kueri -> $buku->peminjamans_count
+        // when() = filter hanya dipasang kalau inputnya ada
+        ->when($request->search, function ($q, $s) {
+            // Dibungkus function supaya orWhere tidak merusak filter kategori
+            $q->where(function ($sub) use ($s) {
+                $sub->where('judul', 'like', "%{$s}%")
+                    ->orWhere('penulis', 'like', "%{$s}%")
+                    ->orWhere('isbn', 'like', "%{$s}%");
+            });
+        })
+        ->when($request->kategori_id, fn ($q, $k) => $q->where('kategori_id', $k))
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();                   // link halaman 2, 3 tetap membawa kata kunci
+
+    // Statistik pakai Query Builder (DB::table): cepat, tanpa Model
+    $stats = [
+        'total_judul'     => DB::table('bukus')->count(),
+        'total_stok'      => (int) DB::table('bukus')->sum('stok'),
+        'sedang_dipinjam' => DB::table('peminjamans')->where('status', 'dipinjam')->count(),
+        'dikembalikan'    => DB::table('peminjamans')->where('status', 'dikembalikan')->count(),
+    ];
+
+    $kategoris = Kategori::orderBy('nama_kategori')->get(); // buat dropdown filter
+
+    return view('buku.index', compact('bukus', 'stats', 'kategoris'));
+}
 
     // CREATE: form tambah (butuh daftar kategori untuk dropdown)
     public function create()
