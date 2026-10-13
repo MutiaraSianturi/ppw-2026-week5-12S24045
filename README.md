@@ -65,3 +65,76 @@ Penjelasan:
 - Controller: `app/Http/Controllers/BukuController.php`,
   `app/Http/Controllers/KategoriController.php`
 - Route: `routes/web.php`
+
+
+---
+
+# Minggu 6: Transaksi ACID, Query Builder, Session & Autentikasi
+
+## Akun Uji Pustakawan
+| Email | Password |
+|---|---|
+| pustakawan@del.ac.id | password123 |
+
+## Fitur Minggu 6
+- Tabel `peminjamans` dengan foreign key ke `bukus` (`cascadeOnDelete`)
+- Peminjaman dan pengembalian memakai `DB::transaction()` + `lockForUpdate()`
+- Stok 0 ditolak, NIM yang sama tidak boleh meminjam buku yang sama sebelum mengembalikan
+- `QueryException` ditangkap dan dicatat lewat `Log::error()`
+- Katalog memakai `with('kategori')->withCount('peminjamans')`, filter `when()`, dan `withQueryString()`
+- Kartu statistik memakai `DB::table()`
+- Login/logout pustakawan (`Auth::attempt`, `session()->regenerate()`, `invalidate()`, `regenerateToken()`)
+- Rute mutasi diproteksi middleware `auth`
+- Session: pencarian terakhir, peminjam terakhir, waktu login. Cookie: `del_last_user_email`
+
+## ERD
+```mermaid
+erDiagram
+    KATEGORIS ||--o{ BUKUS : "punya banyak"
+    BUKUS ||--o{ PEMINJAMANS : "dipinjam dalam"
+    KATEGORIS {
+        bigint id PK
+        string kode_kategori UK
+        string nama_kategori
+    }
+    BUKUS {
+        bigint id PK
+        string isbn UK
+        string judul
+        string penulis
+        string penerbit
+        smallint tahun_terbit
+        bigint kategori_id FK
+        int stok
+        text sinopsis
+    }
+    PEMINJAMANS {
+        bigint id PK
+        string kode_pinjam UK
+        bigint buku_id FK
+        string nim_peminjam
+        string nama_peminjam
+        date tanggal_pinjam
+        date tanggal_jatuh_tempo
+        date tanggal_kembali
+        string status
+    }
+```
+
+## Catatan Locking
+`lockForUpdate()` menghasilkan `SELECT ... FOR UPDATE` (kunci baris) pada MySQL/InnoDB.
+Pada SQLite perintah kunci diabaikan karena SQLite mengunci seluruh database saat proses tulis,
+sehingga operasi tetap berurutan. Kode dan logika transaksi sama untuk kedua mesin.
+
+## Bukti Pengujian
+**Peminjaman berhasil (stok berkurang)**
+![pinjam](docs/screenshots/01-pinjam-sukses.png)
+
+**Penolakan saat stok = 0 (rollback)**
+![stok habis](docs/screenshots/02-stok-habis.png)
+
+**Pengembalian berhasil (stok bertambah)**
+![kembali](docs/screenshots/03-kembali.png)
+
+**Audit cookie DevTools (HttpOnly, SameSite=Lax)**
+![cookie](docs/screenshots/04-cookie-httponly.png)
