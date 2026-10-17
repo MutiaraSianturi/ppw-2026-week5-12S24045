@@ -138,3 +138,13 @@ sehingga operasi tetap berurutan. Kode dan logika transaksi sama untuk kedua mes
 
 **Audit cookie DevTools (HttpOnly, SameSite=Lax)**
 ![cookie](docs/screenshots/04-cookie-httponly.png)
+
+**Bukti session()->regenerate(): ID sesi berubah setelah login**
+
+Sebelum login:
+
+![sebelum login](docs/screenshots/06-sesi-sebelum-login.png)
+
+Sesudah login:
+
+![sesudah login](docs/screenshots/07-sesi-sesudah-login.png)
