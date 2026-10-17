@@ -131,6 +131,4 @@ sehingga operasi tetap berurutan. Kode dan logika transaksi sama untuk kedua mes
 ![stok habis](docs/screenshots/02-stok-habis.png)
 ![kembali](docs/screenshots/03-kembali.png)
 ![cookie](docs/screenshots/04-cookie-httponly.png)
-![sebelum login](docs/screenshots/05-sesi-sebelum-login.png)
-![sesudah login](docs/screenshots/06-sesi-sesudah-login.png)
 
