@@ -14,11 +14,10 @@
                     @forelse($peminjamans as $p)
                         <tr>
                             <td>{{ $p->kode_pinjam }}</td>
-                            <td>{{ $p->buku->judul }}</td> {{-- sudah di-load lewat with('buku') --}}
+                            <td>{{ $p->buku->judul }}</td>
                             <td>{{ $p->nama_peminjam }}<br><small class="text-muted">{{ $p->nim_peminjam }}</small></td>
                             <td>{{ $p->tanggal_pinjam->format('d M Y') }}</td>
                             <td>{{ $p->tanggal_jatuh_tempo->format('d M Y') }}</td>
-                            {{-- ?-> aman kalau nilainya null (belum dikembalikan) --}}
                             <td>{{ $p->tanggal_kembali?->format('d M Y') ?? '-' }}</td>
                             <td>
                                 <span class="badge {{ $p->status === 'dipinjam' ? 'bg-warning text-dark' : 'bg-success' }}">
@@ -26,12 +25,11 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                {{-- Tombol kembalikan hanya muncul kalau masih dipinjam --}}
                                 @if($p->status === 'dipinjam')
                                     <form action="{{ route('peminjaman.kembali', $p->id) }}" method="POST" class="d-inline"
                                           onsubmit="return confirm('Kembalikan buku ini?')">
                                         @csrf
-                                        @method('PATCH') {{-- menyamar jadi PATCH --}}
+                                        @method('PATCH')
                                         <button class="btn btn-sm btn-del">Kembalikan</button>
                                     </form>
                                 @endif
