@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Laravel\Sanctum\HasApiTokens;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
@@ -13,6 +14,12 @@ use Illuminate\Notifications\Notifiable;
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
+    class User extends Authenticatable
+{
+    use HasApiTokens, Notifiable; // Tambahkan HasApiTokens di sini
+
+    // ... kode bawaan lainnya biarkan saja ...
+}
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;

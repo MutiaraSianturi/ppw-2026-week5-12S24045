@@ -1,67 +1,48 @@
-# SIPUS-Del — Sistem Informasi Perpustakaan Kampus Del
+# SIPUS-Del — Sistem Informasi Perpustakaan Kampus Del (Week 9 Extension)
 
-Tugas Mandiri Minggu 5  Pemrograman & Pengujian Web (12S3101)
+Tugas Mandiri Pemrograman & Pengujian Web (12S3101 / PPW)
 Institut Teknologi Del
 
 Nama: Mutiara Y.H. Sianturi
 NIM:  12S24045
 
 ## Deskripsi
-Aplikasi web perpustakaan sederhana untuk mengelola data **buku** dan
-**kategori**, dibangun dengan pola arsitektur MVC (server-side rendering)
-memakai Laravel.
+Pengembangan lanjutan dari aplikasi perpustakaan SIPUS-Del. Pada modul Week 9 ini, sistem diperluas dengan menambahkan dukungan **SOAP Web Service**, **REST API (v1)** lengkap dengan pengelolaan CRUD Buku, **Autentikasi Berbasis Token (Laravel Sanctum)**, serta **Transaksi Peminjaman Buku berbasis ACID** untuk menjaga konsistensi stok data.
 
-## Fitur
-- CRUD Buku dan Kategori memakai `Route::resource` (7 rute per entitas)
-- Implicit Route Model Binding
-- Relasi Kategori hasMany Buku dan Buku belongsTo Kategori
-- Proteksi mass assignment dengan `$fillable`
-- Validasi server-side (`$request->validate()`): ISBN unik 13 digit,
-  judul minimal 5 karakter, stok minimal 0
-- Proteksi CSRF (`@csrf`) dan method spoofing (`@method`) di semua form
-- Master layout Blade Component `<x-layout>` bertema Del Purple (#4C1D95)
-- Flash message, pagination Bootstrap 5, dan `@forelse` untuk data kosong
-- Eager Loading `Buku::with('kategori')` untuk mencegah N+1
-- Seeder dan Factory (Faker): 5 kategori dan 20 buku
+## Fitur Utama Week 9
+- **SOAP Web Service**: Endpoint WSDL dan handler untuk mengecek status bebas pinjam mahasiswa berdasarkan NIM (`/soap/sipus.wsdl` & `/soap/sipus`).
+- **REST API Buku**: Endpoint lengkap (GET, POST, PUT, PATCH, DELETE) untuk pengelolaan data buku di `api/v1/bukus`.
+- **Autentikasi Sanctum**: Fitur login (`/api/v1/login`) dan logout (`/api/v1/logout`) berbasis token bearer yang aman.
+- **Transaksi Peminjaman (ACID)**: Fitur peminjaman dan pengembalian buku (`/api/v1/peminjamans`) yang dilengkapi mekanisme pengamanan stok (`lockForUpdate`) untuk menghindari race condition.
+
+## Fitur Dasar Sebelumnya (Week 5-6)
+- CRUD Buku dan Kategori memakai `Route::resource`
+- Relasi Kategori `hasMany` Buku dan Buku `belongsTo` Kategori
+- Validasi server-side (`$request->validate()`)
+- Eager Loading `Buku::with('kategori')` untuk mencegah N+1 problem
 
 ## Teknologi
-Laravel 13, PHP 8.5, SQLite, Bootstrap 5, Blade
+Laravel 13, PHP 8.5, SQLite, Laravel Sanctum, SOAP Extension, REST JSON API
 
-Catatan: modul menyebut Laravel 11. Proyek ini memakai Laravel 13 sesuai
-arahan dosen. Konsep dan struktur yang dipelajari sama.
-
-## Cara Instalasi
+## Cara Instalasi & Menjalankan Project
 1. `git clone https://github.com/MutiaraSianturi/ppw-2026-week5-12S24045.git`
 2. `cd ppw-2026-week5-12S24045`
 3. `composer install`
 4. `copy .env.example .env`
 5. `php artisan key:generate`
-6. `type nul > database\database.sqlite`
-7. `php artisan migrate:fresh --seed`
-8. `php artisan serve`, lalu buka http://localhost:8000
+6. Buat database SQLite: `New-Item -ItemType File -Path "database\database.sqlite"` (atau lewat touch/manual)
+7. Jalankan migrasi: `php artisan migrate`
+8. Jalankan server lokal: `php artisan serve`, lalu akses http://localhost:8000
 
-## Bukti Audit SQL (Eager Loading)
-Kueri dicatat oleh `DB::listen` di `AppServiceProvider` ke
-`storage/logs/laravel.log`. Pengujian dilakukan dengan membuka halaman
-`/buku` satu kali. File bukti: `docs/audit-eager-loading.log`.
+## Daftar Endpoint API & SOAP
+- **SOAP WSDL**: `GET http://localhost:8000/soap/sipus.wsdl`
+- **SOAP Handler**: `POST http://localhost:8000/soap/sipus`
+- **API Login**: `POST http://localhost:8000/api/v1/login` (mengirim `email` & `password`)
+- **API Buku (REST)**: `GET/POST/PUT/DELETE /api/v1/bukus`
+- **API Peminjaman**: `GET/POST /api/v1/peminjamans` (membutuhkan Bearer Token Sanctum)
 
-| Kondisi | Jumlah kueri halaman /buku |
-|---|---|
-| Eager loading `with('kategori')` | 3 |
-
-Penjelasan:
-- 1 kueri `count` (dari `paginate()`) untuk menghitung total halaman.
-- 1 kueri untuk mengambil 10 buku.
-- 1 kueri untuk mengambil semua kategori sekaligus (`where id in (...)`).
-- Data buku beserta kategorinya diambil dengan 2 kueri terpadu, bukan satu
-  kueri per buku, sehingga tidak terjadi N+1 problem.
-- Agar log bersih, session memakai driver `file` (`SESSION_DRIVER=file`)
-  sehingga tabel `sessions` tidak muncul di log.
-
-## Struktur MVC
-- Model: `app/Models/Buku.php`, `app/Models/Kategori.php`
-- View: `resources/views/buku`, `resources/views/kategori`,
-  `resources/views/components/layout.blade.php`
-- Controller: `app/Http/Controllers/BukuController.php`,
-  `app/Http/Controllers/KategoriController.php`
-- Route: `routes/web.php`
+## Struktur Controller & Endpoint Utama
+- Model: `app/Models/Buku.php`, `app/Models/Kategori.php`, `app/Models/Peminjaman.php`, `app/Models/User.php`
+- Controller REST API: `app/Http/Controllers/Api/V1/BukuApiController.php`, `AuthController.php`, `PeminjamanApiController.php`
+- Controller SOAP: `app/Http/Controllers/SoapController.php`
+- Route: `routes/web.php` & `routes/api.php`
