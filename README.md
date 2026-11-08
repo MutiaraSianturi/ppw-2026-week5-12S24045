@@ -65,3 +65,62 @@ Penjelasan:
 - Controller: `app/Http/Controllers/BukuController.php`,
   `app/Http/Controllers/KategoriController.php`
 - Route: `routes/web.php`
+- 
+
+# SIPUS-Del — Sistem Informasi Perpustakaan Kampus Del
+Tugas Mandiri Minggu 5  Pemrograman & Pengujian Web (12S3101)
+Institut Teknologi Del
+
+Nama: Mutiara Y.H. Sianturi  
+NIM: 12S24045  
+Program Studi: Sistem Informasi  
+Institut Teknologi Del  
+
+---
+
+## Deskripsi Ringkas
+**SIPUS-Del** adalah aplikasi web perpustakaan kampus yang dirancang menggunakan arsitektur MVC (Model-View-Controller). Pada pengembangan lanjutan **Praktikum Week 9**, sistem ini diperluas secara komprehensif dengan mengintegrasikan:
+1. **SOAP Web Service** untuk pengecekan status bebas pinjam mahasiswa secara sinkron berbasis XML/WSDL.
+2. **RESTful API (v1)** untuk pengelolaan data buku lengkap (CRUD).
+3. **Autentikasi Berbasis Token (Laravel Sanctum)** untuk mengamankan akses endpoint privat.
+4. **Transaksi Basis Data Berbasis ACID & Concurrency Control** (`lockForUpdate`) untuk menjamin konsistensi stok pada proses peminjaman dan pengembalian buku.
+
+---
+
+## Fitur & Modul Sistem
+
+### A. Fitur Dasar Web Server-Side (Week 5-6)
+- **Manajemen Buku & Kategori**: Menggunakan `Route::resource` dengan 7 rute standar per entitas.
+- **Relasi Database**: Relasi Eloquent ORM `Kategori hasMany Buku` dan `Buku belongsTo Kategori`.
+- **Validasi Ketat**: Validasi server-side (`$request->validate()`) meliputi keunikan ISBN 13 digit, panjang judul, dan batas stok minimal 0.
+- **Optimasi Kinerja (Eager Loading)**: Menerapkan `Buku::with('kategori')` untuk mencegah masalah *N+1 query problem*.
+- **Antarmuka (Blade & Bootstrap 5)**: Layout konsisten menggunakan komponen kustom Blade bertema Del Purple (`#4C1D95`), pesan *flash*, pagination, dan struktur `@forelse`.
+
+### B. Fitur Web Service & API (Week 9 Extension)
+- **SOAP Web Service**:
+  - WSDL Endpoint: `GET /soap/sipus.wsdl`
+  - SOAP Handler Endpoint: `POST /soap/sipus` (untuk validasi status peminjaman berdasarkan NIM).
+- **REST API v1 (Buku & Peminjaman)**:
+  - **CRUD Buku**: Endpoint publik dan terproteksi untuk melihat, menambah, memperbarui, dan menghapus data buku.
+  - **Autentikasi Sanctum**: Endpoint Login (`POST /api/v1/login`) yang menghasilkan *Bearer Token* dan Logout (`POST /api/v1/logout`).
+  - **Transaksi Peminjaman ACID**: Endpoint (`POST /api/v1/peminjamans`) yang dilengkapi proteksi `DB::transaction` dan `lockForUpdate` untuk mencegah *race condition* saat stok buku menipis.
+
+---
+
+## Stack Teknologi
+- **Bahasa & Framework**: PHP 8.5.11, Laravel 13
+- **Database**: SQLite (`database/database.sqlite`)
+- **Autentikasi**: Laravel Sanctum v4+
+- **Protokol Web**: HTTP REST JSON API, SOAP XML / WSDL
+- **Frontend / UI**: Bootstrap 5, Blade Component Templates
+
+---
+
+## Panduan Instalasi & Menjalankan Proyek
+
+Ikuti langkah-langkah di bawah ini di terminal VS Code (pada *branch* `week9-rest-api`):
+
+1. **Clone Repository & Masuk ke Folder Proyek**:
+   ```powershell
+   git clone [https://github.com/MutiaraSianturi/ppw-2026-week5-12S24045.git](https://github.com/MutiaraSianturi/ppw-2026-week5-12S24045.git)
+   cd ppw-2026-week5-12S24045
