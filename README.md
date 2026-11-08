@@ -68,7 +68,7 @@ Penjelasan:
 - 
 
 # SIPUS-Del — Sistem Informasi Perpustakaan Kampus Del
-Tugas Mandiri Minggu 5  Pemrograman & Pengujian Web (12S3101)
+Tugas Mandiri Minggu 9 Pemrograman & Pengujian Web (12S3101)
 Institut Teknologi Del
 
 Nama: Mutiara Y.H. Sianturi  
