@@ -62,7 +62,7 @@ class PeminjamanApiController extends Controller
     }
 
     // Pengembalian Buku
-    ($request, $id)
+    public function update(Request $request, $id)
     {
         return DB::transaction(function () use ($id) {
             $peminjaman = Peminjaman::find($id);
