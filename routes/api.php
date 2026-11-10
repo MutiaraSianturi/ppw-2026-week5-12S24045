@@ -24,5 +24,7 @@ Route::middleware('auth:sanctum')->post('v1/logout', [AuthController::class, 'lo
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('v1/peminjamans', [PeminjamanApiController::class, 'index']);
     Route::post('v1/peminjamans', [PeminjamanApiController::class, 'store']);
-    Route::patch('v1/peminjamans/{id}/kembalikan', [PeminjamanApiController::class, 'kembalikan']);
+    
+    // Ganti 'kembalikan' menjadi 'update' (atau 'kembalikan' jika memang method di controller-mu bernama kembalikan)
+    Route::patch('v1/peminjamens/{id}/kembalikan', [PeminjamanApiController::class, 'update']);
 });
