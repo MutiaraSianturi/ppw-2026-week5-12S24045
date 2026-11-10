@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\BukuApiController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PeminjamanApiController;
+use App\Http\Controllers\Api\V1\AuthTokenController;
+
+Route::post('/v1/auth/login', [AuthTokenController::class, 'login']);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
