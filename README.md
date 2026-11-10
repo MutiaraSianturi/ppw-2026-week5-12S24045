@@ -34,4 +34,19 @@
 9. `php artisan serve`
 
 ## 5. Galeri Bukti Pengujian (Screenshots)
-Seluruh skenario pengujian endpoint SOAP dan REST API telah didokumentasikan di folder `docs/screenshots/`.
+Seluruh skenario pengujian endpoint telah didokumentasikan di folder `docs/screenshots/`:
+
+1. **Screenshot 1: Autentikasi / Login (Mendapatkan Token Sanctum)**
+   ![Screenshot 1](docs/screenshots/01-api-login.png)
+
+2. **Screenshot 2: Daftar Rute Endpoint API (Route List)**
+   ![Screenshot 2](docs/screenshots/02-route-list.png)
+
+3. **Screenshot 3: Endpoint GET Katalog Buku (Public)**
+   ![Screenshot 3](docs/screenshots/03-get-bukus.png)
+
+4. **Screenshot 4: Endpoint POST Peminjaman Buku**
+   ![Screenshot 4](docs/screenshots/04-post-pinjam.png)
+
+5. **Screenshot 5: Endpoint PATCH Pengembalian Buku**
+   ![Screenshot 5](docs/screenshots/05-patch-kembali.png)
